@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "target": "ES2020", // Целевая версия JavaScript
+    "module": "CommonJS", // Используем CommonJS для Node.js
+    "outDir": "./dist", // Папка для скомпилированных файлов
+    "rootDir": "./src", // Папка с исходным кодом
+    "strict": true, // Включает строгую проверку типов
+    "esModuleInterop": true, // Упрощает работу с CommonJS-модулями
+    "skipLibCheck": true // Пропускает проверку типов для библиотек
+  },
+  "include": ["src/**/*"], // Какие файлы компилировать
+  "exclude": ["node_modules"] // Какие файлы игнорировать
+}
