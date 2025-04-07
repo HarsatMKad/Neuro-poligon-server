@@ -7,7 +7,7 @@ import { authenticateToken } from "../middlewares/authMiddleware";
 const router = express.Router();
 
 router.post("/login", login);
-router.post("/register/student", registerUser);
+router.post("/register", registerUser);
 router.get("/users", authenticateToken, getUsers)
 
 router.post("/substrates", authenticateToken, upload, processImage, createCustomSubstrates)

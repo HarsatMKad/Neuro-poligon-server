@@ -2,7 +2,7 @@ import { Schema, model, Model } from "mongoose";
 
 interface IUser {
   _id: string;
-  name: string;
+  username: string;
   email: string;
   password: string;
   subscription_lvl: string;
@@ -16,7 +16,7 @@ interface IUserMethods {
 type UserModel = Model<IUser, object, IUserMethods>;
 
 const userSchema: Schema = new Schema<IUser, UserModel, IUserMethods>({
-  name: {
+  username: {
     type: String,
     required: true,
   },

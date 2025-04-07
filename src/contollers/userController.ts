@@ -9,7 +9,7 @@ export const registerUser = async (
   next: NextFunction
 ) => {
   try {
-    const { name, email, password } = req.body;
+    const { username, email, password } = req.body;
 
     const existingUser = await Users.findOne({ email });
     if (existingUser) {
@@ -22,12 +22,14 @@ export const registerUser = async (
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = new Users({
-      name,
+      username,
       email,
       password: hashedPassword,
       subscription_lvl: "Base",
-      expiration_sup_date: null,
+      expiration_sup_date: 0,
     });
+
+    await newUser.save();
 
     const token = generateToken(newUser._id);
 
