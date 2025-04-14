@@ -3,6 +3,10 @@ import Users from "../models/users";
 import bcrypt from "bcrypt";
 import { generateToken } from "../utils/authService";
 
+interface AuthRequest extends Request {
+  user?: { id: string };
+}
+
 export const registerUser = async (
   req: Request,
   res: Response,
@@ -21,6 +25,7 @@ export const registerUser = async (
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
+
     const newUser = new Users({
       username,
       email,
@@ -30,9 +35,7 @@ export const registerUser = async (
     });
 
     await newUser.save();
-
     const token = generateToken(newUser._id);
-
     res.status(201).json({ message: "Регистрация успешна", token: token });
   } catch (error) {
     next(error);
@@ -71,7 +74,31 @@ export const getUsers = async (
 ) => {
   try {
     const userList = await Users.find();
-    res.json(userList);
+    res.status(201).json(userList);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getUsersById = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    if (!req.user) {
+      res.status(404).json({ message: "пользователь не зарегистрирован." });
+      return;
+    }
+    const userId = req.user.id;
+    const user = await Users.findById(userId);
+
+    if (!user) {
+      res.status(404).json({ message: "Пользователь не найден" });
+      return
+    }
+
+    res.status(201).json({ username: user.username, email: user.email, subscription_lvl: user.subscription_lvl });
   } catch (error) {
     next(error);
   }
