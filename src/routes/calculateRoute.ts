@@ -4,7 +4,7 @@ import { authenticateToken } from "../middlewares/authMiddleware";
 
 const router = express.Router();
 
-router.get("/", authenticateToken, calculatePolygons)
-router.get("/download", authenticateToken, downloadPolygons)
+router.get("/", calculatePolygons)
+router.get("/download", downloadPolygons)
 
 export default router

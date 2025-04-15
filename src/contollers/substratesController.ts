@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import CustomSubstrates from "../models/customSubstrates";
+import Substrates from "../models/substrates";
 import fs from "fs";
 import path from "path";
 
@@ -23,7 +23,7 @@ export const createCustomSubstrates = async (
     const userId = (req as any).user.id;
     const { image, original_name } = req.body;
 
-    const newCustomSubstrates = new CustomSubstrates({
+    const newCustomSubstrates = new Substrates({
       user_id: userId,
       image,
       original_name,
@@ -61,8 +61,8 @@ export const getSubstrates = async (
 
     const user_id = req.user.id;
 
-    const customSubstratesList = await CustomSubstrates.find({ user_id });
-    res.status(201).json(customSubstratesList);
+    const customSubstratesList = await Substrates.find({ user_id });
+    res.status(200).json(customSubstratesList);
   } catch (error) {
     next(error);
   }
@@ -76,7 +76,7 @@ export const getSubstrateById = async (
   try {
     const id = req.params.id;
 
-    const customSubstrate = await CustomSubstrates.findById(id);
+    const customSubstrate = await Substrates.findById(id);
 
     if (!customSubstrate) {
       res.status(404).json({ message: "Файл не найден" });
@@ -95,7 +95,7 @@ export const getSubstrateById = async (
       return;
     }
 
-    res.status(201).sendFile(imagePath, { headers: { "Content-Type": "image/tiff" } });
+    res.status(200).sendFile(imagePath, { headers: { "Content-Type": "image/tiff" } });
   } catch (error) {
     next(error);
   }

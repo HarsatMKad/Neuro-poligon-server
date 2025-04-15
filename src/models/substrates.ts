@@ -1,13 +1,13 @@
 import { Schema, model } from "mongoose";
 
-interface ICustomSubstrates {
+interface ISubstrates {
   _id: string;
   user_id: Schema.Types.ObjectId;
   original_name: string;
   image: string;
 }
 
-const customSubstrates: Schema = new Schema<ICustomSubstrates>({
+const substrates: Schema = new Schema<ISubstrates>({
   user_id: {
     type: Schema.Types.ObjectId,
     required: true,
@@ -23,7 +23,7 @@ const customSubstrates: Schema = new Schema<ICustomSubstrates>({
   },
 });
 
-const CustomSubstrates = model<ICustomSubstrates>("custom_substrates", customSubstrates);
+const Substrates = model<ISubstrates>("substrates", substrates);
 
-export default CustomSubstrates;
-export { ICustomSubstrates };
+export default Substrates;
+export { ISubstrates };

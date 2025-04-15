@@ -5,8 +5,9 @@ interface IUser {
   username: string;
   email: string;
   password: string;
-  subscription_lvl: string;
+  subscription?: Schema.Types.ObjectId;
   expiration_sup_date: number;
+  is_deleted: boolean;
 }
 
 interface IUserMethods {
@@ -29,14 +30,22 @@ const userSchema: Schema = new Schema<IUser, UserModel, IUserMethods>({
     type: String,
     required: true,
   },
-  subscription_lvl: {
-    type: String,
+  subscription: {
+    type: Schema.Types.ObjectId,
     required: true,
+    default: null,
+    ref: "subscriptions",
   },
   expiration_sup_date: {
     type: Number,
     required: true,
+    default: Date.now()
   },
+  is_deleted: {
+    type: Boolean,
+    required: true,
+    default: false,
+  }
 });
 
 const Users = model<IUser, UserModel>("Users", userSchema);

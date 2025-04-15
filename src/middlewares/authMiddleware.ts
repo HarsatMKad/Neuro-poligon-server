@@ -28,6 +28,11 @@ export const authenticateToken = async (
       return;
     }
 
+    if(user.is_deleted){
+      res.status(404).json({ message: "Пользователь удален" });
+      return;
+    }
+
     req.user = { id: decoded.id };
     next();
   } catch (error) {
