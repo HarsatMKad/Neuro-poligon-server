@@ -25,6 +25,30 @@ export const registerUser = async (
       return;
     }
 
+    if (username.length < 4) {
+      res.status(403).json({
+        message: "Имя слишком короткое",
+        token: "",
+      });
+      return;
+    }
+
+    if (email.length < 6) {
+      res.status(403).json({
+        message: "Почта слишком короткая",
+        token: "",
+      });
+      return;
+    }
+
+    if (password.length < 6) {
+      res.status(403).json({
+        message: "Пароль слишком короткий",
+        token: "",
+      });
+      return;
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = new Users({
@@ -125,7 +149,7 @@ export const updateUser = async (
 
     res
       .status(201)
-      .json({ message: "Пользователь успешно обновлен", updatedUser });
+      .json({ message: "Данные успешно обновлены", updatedUser });
   } catch (error) {
     next(error);
   }
@@ -236,10 +260,7 @@ export const changeSubscription = async (
     }
     const { subId } = req.params;
 
-    console.log("subId", subId);
-
     const subscription = await Subscription.findById(subId);
-    console.log(subscription);
 
     if (!subscription) {
       res.status(404).json({ message: "Подписка не найдена." });
@@ -252,11 +273,18 @@ export const changeSubscription = async (
     }
 
     const expirationSubDate = Date.now() + subscription.duration;
-    const user = await Users.findByIdAndUpdate(userId.id, {
-      subscription: subId,
-      expiration_sup_date: expirationSubDate,
-    }).populate("subscription");
-    res.status(200).json(user);
+    const updatedUser = await Users.findByIdAndUpdate(
+      userId.id,
+      {
+        subscription: subId,
+        expiration_sup_date: expirationSubDate,
+      },
+      {
+        new: true,
+        runValidators: true,
+      }
+    ).populate("subscription");
+    res.status(200).json(updatedUser);
   } catch (error) {
     next(error);
   }

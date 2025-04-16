@@ -1,26 +1,37 @@
 import { Request, Response, NextFunction } from "express";
 import Subscription from "../models/subscriptions";
+import Users from "../models/users";
 
 interface AuthRequest extends Request {
   user?: { id: string };
 }
 
 export const getSubscriptions = async (
-  req: Request,
+  req: AuthRequest,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const { validFilter } = req.body;
+    const { validFilter } = req.params;
 
-    let query: { valid?: boolean } = {valid: true};
+    let query: { valid?: boolean } = { valid: true };
 
-    if (validFilter == false) {
+    if (validFilter != undefined) {
       query = {};
     }
 
+    if (!req.user) {
+      res.status(404).json({ message: "Пользователь не зарегистрировался" });
+      return;
+    }
+
+    const user = await Users.findById(req.user.id);
+    if (!user) {
+      res.status(404).json({ message: "Пользователь не найден" });
+      return;
+    }
     const subscriptions = await Subscription.find(query);
-    res.status(200).json(subscriptions);
+    res.status(200).json({ subscriptions, userSub: user.subscription });
   } catch (error: any) {
     next(error);
   }
@@ -41,9 +52,8 @@ export const createSubscription = async (
   }
 };
 
-// Обновление подписки
 export const updateSubscription = async (
-  req: AuthRequest,
+  req: Request,
   res: Response,
   next: NextFunction
 ) => {

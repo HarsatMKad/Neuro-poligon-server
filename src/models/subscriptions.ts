@@ -5,6 +5,7 @@ interface ISubscriptions {
   name: string;
   description: string;
   lvl: number;
+  substrates_max: number;
   price: number;
   duration: number;
   valid: boolean;
@@ -25,6 +26,11 @@ const substrates: Schema = new Schema<ISubscriptions>({
     type: Number,
     required: true,
     default: 0,
+  },
+  substrates_max: {
+    type: Number,
+    required: true,
+    default: 1,
   },
   price: {
     type: Number,

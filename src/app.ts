@@ -16,6 +16,6 @@ app.use(cors());
 app.use("/api/users", userRoute)
 app.use("/api/substrates", authenticateToken, checkSub(1), customSubstratesRoute)
 app.use("/api/calculate", authenticateToken, checkSub(1), calculateRouter)
-app.use("/api/sub", authenticateToken, checkSub(1), subscriptionRouter)
+app.use("/api/sub", authenticateToken, subscriptionRouter)
 
 export default app;

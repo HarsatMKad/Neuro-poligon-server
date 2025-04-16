@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import config from "../utils/config";
 import Users from "../models/users";
 import jwt from "jsonwebtoken";
-import Subscription, { ISubscriptions } from "../models/subscriptions";
+import { ISubscriptions } from "../models/subscriptions";
 
 interface AuthRequest extends Request {
   user?: { id: string };
