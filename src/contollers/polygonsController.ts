@@ -5,6 +5,60 @@ import path from "path";
 import fs from "fs";
 import { clipGeoTiff } from "../utils/clipGeoTiff";
 import filterPolygonsInsideMain from "../utils/filterPolygons";
+import { ShapeReader } from "shpts";
+
+export async function readshp(): Promise<Polygon[]> {
+  const shpPath = path.join(
+    __dirname,
+    "../../utilFiles/polygons/Polygon wgs84.shp"
+  );
+  const shxPath = path.join(
+    __dirname,
+    "../../utilFiles/polygons/Polygon wgs84.shx"
+  );
+
+  if (!fs.existsSync(shpPath) || !fs.existsSync(shxPath)) {
+    console.log("Файлы не найдены");
+    return [];
+  }
+
+  const shpBuffer = await fs.readFileSync(shpPath);
+  const shxBuffer = await fs.readFileSync(shxPath);
+
+  const reader = await ShapeReader.fromArrayBuffer(
+    shpBuffer.buffer,
+    shxBuffer.buffer
+  );
+  const numRecords = reader.recordCount;
+
+  const polygons: Polygon[] = [];
+
+  let passCount = 0;
+
+  for(let index = 0; index< numRecords; index++){
+    try{
+      const shape = reader.readGeom(index);
+      if(shape){
+        if (shape.type === 'Null') {
+          passCount += 1
+          continue;
+        }
+
+        const geojson = shape.toGeoJson();
+        if(geojson.type === "Polygon"){
+          const polygonGeoJson = geojson as GeoJSON.Polygon;
+          polygons.push(polygonGeoJson.coordinates[0] as Polygon)
+        }
+      }
+    } catch(error){
+      console.log(error)
+    }
+  }
+
+  console.log("Количество пропусков:", passCount)
+  console.log("Посчитано полигонов:", polygons.length)
+  return polygons
+}
 
 const points: Polygon[] = [
   [
@@ -57,10 +111,17 @@ export const calculatePolygons = async (
 
     polygon.push(polygon[0]);
 
-    const internalPolygons = filterPolygonsInsideMain(points, polygon);
+    const points = await readshp()
 
+    const correctedPoints: Polygon[] = points.map((polygon) => {
+      return polygon.map((coordPair) => {
+        return [coordPair[1], coordPair[0]];
+      });
+    });
+
+    const internalPolygons = filterPolygonsInsideMain(correctedPoints, polygon);
+    
     const data = { points: internalPolygons };
-
     res.status(201).json(data);
   } catch (error) {
     next(error);
@@ -95,16 +156,15 @@ export const downloadPolygons = async (
     }
 
     polygon.push(polygon[0]);
-
-    const internalPolygons = filterPolygonsInsideMain(points, polygon);
-
-    const correctedPoints: Polygon[] = internalPolygons.map((polygon) => {
-      return polygon.map((coordPair) => {
-        return [coordPair[1], coordPair[0]];
-      });
+  
+    const correctedPolygon: Polygon = (polygon as Polygon).map((polygon) => {
+      return [polygon[1], polygon[0]];
     });
 
-    shpwrite.write([{ id: 0 }], "POLYGON", [correctedPoints], finish);
+    const points = await readshp()
+    const internalPolygons = filterPolygonsInsideMain(points, correctedPolygon);
+
+    shpwrite.write([{ id: 0 }], "POLYGON", [internalPolygons], finish);
   } catch (error) {
     next(error);
   }

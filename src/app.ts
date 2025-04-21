@@ -5,6 +5,7 @@ import calculateRouter from "./routes/calculateRoute";
 import { authenticateToken } from "./middlewares/authMiddleware";
 import subscriptionRouter from "./routes/subscriptionRoute";
 import { checkSub } from "./middlewares/checkSub";
+import { readshp } from "./contollers/polygonsController";
 import cors from "cors";
 
 const app = express();
